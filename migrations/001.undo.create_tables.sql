@@ -1,0 +1,2 @@
+DROP TABLE IF EXISTS time_series;
+DROP TABLE IF EXISTS stocks;
