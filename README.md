@@ -23,12 +23,12 @@ Creates a new stock to track if the limit of 120 is not met. Requires the symbol
 }
 
 // res.body
-{
+[
   id: ID,
   price: String,
   datetime: DateTime,
   stock_id: StockId
-}
+]
 ```
 
 ### GET `/api/time-series/:symbol`

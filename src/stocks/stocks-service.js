@@ -1,17 +1,17 @@
 const stocksService = {
   // SELECT symbol FROM stocks;
   getAllSymbols(knex) {
-    return knex.select("symbol").from("stocks");
+    return knex.select("symbol", "name").from("stocks");
   },
   // In one transaction insert the symbol into stocks.
   // Then use the generated id for the stock to insert its timeseries.
   // Rollback if any part fails
-  createStock(knex, symbol, series) {
+  createStock(knex, symbol, name, series) {
     // TODO: limit to 120
     return knex.transaction(t => {
       return knex("stocks")
         .transacting(t)
-        .insert({ symbol })
+        .insert({ symbol, name })
         .returning("*")
         .then(rows => {
           return rows[0];

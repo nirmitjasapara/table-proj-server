@@ -9,7 +9,8 @@ const stocksRouter = express.Router();
 const jsonParser = express.json();
 
 const serialize = stocks => ({
-  symbol: xss(stocks.symbol)
+  symbol: xss(stocks.symbol),
+  name: xss(stocks.name)
 });
 
 stocksRouter
@@ -35,22 +36,31 @@ stocksRouter
       if (err) {
         next(err);
       }
-      StocksService.createStock(
-        req.app.get("db"),
-        symbol,
-        body.values.map(point => ({
-          price: xss(point.close),
-          datetime: xss(point.datetime)
-        }))
-      )
-        .then(series => {
-          // Respond with the time series just inserted
-          res
-            .status(201)
-            .location(path.posix.join(req.originalUrl, `/${series.id}`))
-            .json(series);
-        })
-        .catch(next);
+      const refurl = `${TWELVEDATA_API_ENDPOINT}/stocks?symbol=${symbol}&country=United%20States`;
+      request(refurl, { json: true }, (err, r, company) => {
+        if (err || company.data.length == 0) {
+          next(err);
+        }
+        const name = company.data[0].name;
+        console.log(name);
+        StocksService.createStock(
+          req.app.get("db"),
+          symbol,
+          name,
+          body.values.map(point => ({
+            price: xss(point.close),
+            datetime: xss(point.datetime)
+          }))
+        )
+          .then(series => {
+            // Respond with the time series just inserted
+            res
+              .status(201)
+              .location(path.posix.join(req.originalUrl, `/${series.id}`))
+              .json(series);
+          })
+          .catch(next);
+      });
     });
   });
 
