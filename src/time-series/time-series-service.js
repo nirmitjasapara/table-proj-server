@@ -5,7 +5,8 @@ const timeSeriesService = {
       .from("stocks")
       .join("time_series", "stocks.id", "time_series.stock_id")
       .select("*")
-      .where("symbol", symbol);
+      .where("symbol", symbol)
+      .orderBy("datetime", "desc");
   }
 };
 
